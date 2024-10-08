@@ -1,3 +1,3 @@
-# NestJS API template
+# NestJS API Template 📜
 
-This repository serves as a template for new back-end applications.
+Este repositório tem como base servir de template para os projetos back-end.
