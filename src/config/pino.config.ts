@@ -1,6 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { Level } from 'pino';
 import { Environment } from '../shared/enums/environment.enum';
+import { PrettyOptions } from 'pino-pretty';
 
 export default registerAs('pino', () => {
   const level: Level = (process.env.PINO_LOG_LEVEL as Level) ?? 'info';
@@ -18,6 +19,9 @@ export default registerAs('pino', () => {
             {
               level,
               target: 'pino-pretty',
+              options: {
+                colorize: true,
+              } satisfies PrettyOptions,
             },
           ]
         : [
