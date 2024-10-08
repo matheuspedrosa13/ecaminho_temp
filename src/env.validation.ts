@@ -62,6 +62,9 @@ class EnvironmentVariables {
 
   @IsNumber()
   REDIS_DB: number;
+
+  @IsString()
+  PRISMA_DB_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {
