@@ -1,18 +1,21 @@
-import { Module, RequestMethod } from '@nestjs/common';
+import { Module, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './config/app.config';
 import { validate } from './env.validation';
-import { LoggerModule } from 'nestjs-pino';
+import { LoggerErrorInterceptor, LoggerModule } from 'nestjs-pino';
 import { IncomingMessage } from 'node:http';
-import pinoConfig from './config/pino.config';
+import loggerConfig from './config/logger.config';
 import { TransportTargetOptions } from 'pino';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerBehindProxyGuard } from './shared/guards/throttler-behind-proxy.guard';
 import { RedisModule } from './shared/modules/redis/redis.module';
-import throttlersConfig from './config/throttlers.config';
+import throttlerConfig from './config/throttler.config';
 import redisConfig from './config/redis.config';
 import { ThrottlerStorageRedisService } from './shared/modules/redis/throttler-storage-redis.service';
+import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
+import { HttpExceptionFilter } from './shared/filters/http-exception-filter';
+import { customExceptionFactory } from './shared/helpers/custom-exception-factory';
 
 @Module({
   imports: [
@@ -21,7 +24,7 @@ import { ThrottlerStorageRedisService } from './shared/modules/redis/throttler-s
       expandVariables: true,
       validate,
       cache: true,
-      load: [appConfig, pinoConfig, throttlersConfig, redisConfig],
+      load: [appConfig, loggerConfig, throttlerConfig, redisConfig],
     }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
@@ -67,6 +70,27 @@ import { ThrottlerStorageRedisService } from './shared/modules/redis/throttler-s
     {
       provide: APP_GUARD,
       useClass: ThrottlerBehindProxyGuard,
+    },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        exceptionFactory: customExceptionFactory,
+      }),
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerErrorInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
   ],
 })
