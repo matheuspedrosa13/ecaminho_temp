@@ -6,6 +6,13 @@ import { LoggerModule } from 'nestjs-pino';
 import { IncomingMessage } from 'node:http';
 import pinoConfig from './config/pino.config';
 import { TransportTargetOptions } from 'pino';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerBehindProxyGuard } from './shared/guards/throttler-behind-proxy.guard';
+import { RedisModule } from './shared/modules/redis/redis.module';
+import throttlersConfig from './config/throttlers.config';
+import redisConfig from './config/redis.config';
+import { ThrottlerStorageRedisService } from './shared/modules/redis/throttler-storage-redis.service';
 
 @Module({
   imports: [
@@ -14,7 +21,7 @@ import { TransportTargetOptions } from 'pino';
       expandVariables: true,
       validate,
       cache: true,
-      load: [appConfig, pinoConfig],
+      load: [appConfig, pinoConfig, throttlersConfig, redisConfig],
     }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
@@ -38,6 +45,29 @@ import { TransportTargetOptions } from 'pino';
         exclude: [{ method: RequestMethod.GET, path: 'health' }],
       }),
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [
+        RedisModule.registerAsync({
+          inject: [ConfigService],
+          useFactory: (configService: ConfigService) =>
+            configService.get('redis'),
+        }),
+      ],
+      useFactory: (
+        configService: ConfigService,
+        throttlerStorageRedisService: ThrottlerStorageRedisService,
+      ) => ({
+        throttlers: configService.get('throttlers'),
+        storage: throttlerStorageRedisService,
+      }),
+      inject: [ConfigService, ThrottlerStorageRedisService],
+    }),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerBehindProxyGuard,
+    },
   ],
 })
 export class AppModule {}

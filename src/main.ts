@@ -5,11 +5,18 @@ import { RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
 import { LoggerErrorInterceptor, Logger as PinoLogger } from 'nestjs-pino';
+import { randomUUID } from 'crypto';
+import { REQUEST_ID_HEADER } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(
     AppModule,
-    new FastifyAdapter({ trustProxy: true, logger: false }),
+    new FastifyAdapter({
+      trustProxy: true,
+      logger: false,
+      requestIdHeader: REQUEST_ID_HEADER,
+      genReqId: () => randomUUID(),
+    }),
     { bufferLogs: true },
   );
 
