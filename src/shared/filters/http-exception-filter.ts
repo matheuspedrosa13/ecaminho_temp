@@ -19,7 +19,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const { errors } = <ExceptionResponse>exception.getResponse();
 
     response.status(statusCode).send({
-      statusCode,
+      status: statusCode,
       message:
         statusCode >= HttpStatus.INTERNAL_SERVER_ERROR
           ? 'Internal server error'
