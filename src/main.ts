@@ -10,7 +10,7 @@ import { REQUEST_ID_HEADER } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(
-    AppModule,
+    AppModule, 
     new FastifyAdapter({
       trustProxy: true,
       logger: false,

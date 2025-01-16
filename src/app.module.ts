@@ -6,16 +6,14 @@ import { LoggerErrorInterceptor, LoggerModule } from 'nestjs-pino';
 import { IncomingMessage } from 'node:http';
 import loggerConfig from './config/logger.config';
 import { TransportTargetOptions } from 'pino';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ThrottlerBehindProxyGuard } from './shared/guards/throttler-behind-proxy.guard';
-import { RedisModule } from './shared/modules/redis/redis.module';
-import throttlerConfig from './config/throttler.config';
-import redisConfig from './config/redis.config';
-import { ThrottlerStorageRedisService } from './shared/modules/redis/throttler-storage-redis.service';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
 import { HttpExceptionFilter } from './shared/filters/http-exception-filter';
 import { customExceptionFactory } from './shared/helpers/custom-exception-factory';
+import { PrismaService } from './prisma/prisma.service';
+import { UserModule } from './user/user.module';
+import { UserService } from './user/user.service';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -24,7 +22,7 @@ import { customExceptionFactory } from './shared/helpers/custom-exception-factor
       expandVariables: true,
       validate,
       cache: true,
-      load: [appConfig, loggerConfig, throttlerConfig, redisConfig],
+      load: [appConfig, loggerConfig],
     }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
@@ -44,33 +42,13 @@ import { customExceptionFactory } from './shared/helpers/custom-exception-factor
               'pino.transport.targets',
             ),
           },
-        },
-        exclude: [{ method: RequestMethod.GET, path: 'health' }],
+        }
       }),
     }),
-    ThrottlerModule.forRootAsync({
-      imports: [
-        RedisModule.registerAsync({
-          inject: [ConfigService],
-          useFactory: (configService: ConfigService) =>
-            configService.get('redis'),
-        }),
-      ],
-      useFactory: (
-        configService: ConfigService,
-        throttlerStorageRedisService: ThrottlerStorageRedisService,
-      ) => ({
-        throttlers: configService.get('throttlers'),
-        storage: throttlerStorageRedisService,
-      }),
-      inject: [ConfigService, ThrottlerStorageRedisService],
-    }),
+    PrismaModule,
+    UserModule,
   ],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerBehindProxyGuard,
-    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -92,6 +70,8 @@ import { customExceptionFactory } from './shared/helpers/custom-exception-factor
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-  ],
+    PrismaService,
+    UserService
+  ]
 })
 export class AppModule {}
