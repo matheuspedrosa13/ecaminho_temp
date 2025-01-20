@@ -10,13 +10,17 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
 import { HttpExceptionFilter } from './shared/filters/http-exception-filter';
 import { customExceptionFactory } from './shared/helpers/custom-exception-factory';
-import { PrismaService } from './prisma/prisma.service';
-import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { UserController } from './user/user.controller';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
+    PrismaModule,
+    UserModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,
@@ -44,9 +48,7 @@ import { PrismaModule } from './prisma/prisma.module';
           },
         }
       }),
-    }),
-    PrismaModule,
-    UserModule,
+    })
   ],
   providers: [
     {
@@ -69,9 +71,7 @@ import { PrismaModule } from './prisma/prisma.module';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
-    },
-    PrismaService,
-    UserService
+    }
   ]
 })
 export class AppModule {}

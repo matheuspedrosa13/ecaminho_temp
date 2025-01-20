@@ -31,7 +31,7 @@ async function bootstrap() {
   app.enableShutdownHooks();
   app.enableVersioning({ defaultVersion: '1', type: VersioningType.URI });
   app.enableCors(configService.get('app.cors'));
-  app.setGlobalPrefix('/api', {
+  app.setGlobalPrefix('api', {
     exclude: [{ path: 'health', method: RequestMethod.GET }],
   });
 
