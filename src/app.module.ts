@@ -11,10 +11,8 @@ import { ResponseInterceptor } from './shared/interceptors/response.interceptor'
 import { HttpExceptionFilter } from './shared/filters/http-exception-filter';
 import { customExceptionFactory } from './shared/helpers/custom-exception-factory';
 import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { UserController } from './user/user.controller';
-import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
