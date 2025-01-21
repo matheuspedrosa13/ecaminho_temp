@@ -1,5 +1,6 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
+import { eca_genders } from '@prisma/client';
 import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('user')
@@ -9,6 +10,7 @@ export class UserController {
     @UseGuards(AuthGuard)
     @Get('')
     async getGenders(){
-        return await this.userService.getGenders()
+        const genders = await this.userService.getGenders()
+        return {message: "Genders", data: genders}
     }
 }
