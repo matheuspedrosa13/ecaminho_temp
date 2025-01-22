@@ -1,7 +1,7 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { eca_genders } from '@prisma/client';
-import { AuthGuard } from 'src/modules/auth/auth.guard';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
 
 @Controller('user')
 export class UserController {
