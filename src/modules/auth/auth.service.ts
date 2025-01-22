@@ -18,7 +18,7 @@ export class AuthService {
 
     let cryptHelper = new BCryptHelper()
     let isPasswordMatch = await cryptHelper.compare(signInDto.password, user?.user_password)
-    if (!isPasswordMatch) 
+    if (!isPasswordMatch)
       throw new UnauthorizedException();
 
     const payload = { sub: user.pk_id, username: user.email };
