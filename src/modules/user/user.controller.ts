@@ -1,16 +1,18 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get} from '@nestjs/common';
 import { UserService } from './user.service';
-import { eca_genders } from '@prisma/client';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { HttpResponse } from 'src/shared/interfaces/http-response.interface';
 
 @Controller('user')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @UseGuards(AuthGuard)
-    @Get('')
+    @Get('genders')
     async getGenders(){
         const genders = await this.userService.getGenders()
-        return {message: "Genders", data: genders}
+        const response : HttpResponse<any> = {
+              data: genders,
+              message: "Success"
+        }
+        return response
     }
 }

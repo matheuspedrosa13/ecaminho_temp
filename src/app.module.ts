@@ -6,13 +6,14 @@ import { LoggerErrorInterceptor, LoggerModule } from 'nestjs-pino';
 import { IncomingMessage } from 'node:http';
 import loggerConfig from './config/logger.config';
 import { TransportTargetOptions } from 'pino';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
 import { HttpExceptionFilter } from './shared/filters/http-exception-filter';
 import { customExceptionFactory } from './shared/helpers/custom-exception-factory';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
+import { AuthGuard } from './shared/guards/auth.guard';
 
 @Module({
   imports: [
@@ -57,6 +58,10 @@ import { UserModule } from './modules/user/user.module';
         forbidNonWhitelisted: true,
         exceptionFactory: customExceptionFactory,
       }),
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
     },
     {
       provide: APP_INTERCEPTOR,
