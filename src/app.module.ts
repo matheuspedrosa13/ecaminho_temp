@@ -1,4 +1,4 @@
-import { Module, RequestMethod, ValidationPipe } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './config/app.config';
 import { validate } from './env.validation';
@@ -6,25 +6,32 @@ import { LoggerErrorInterceptor, LoggerModule } from 'nestjs-pino';
 import { IncomingMessage } from 'node:http';
 import loggerConfig from './config/logger.config';
 import { TransportTargetOptions } from 'pino';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ThrottlerBehindProxyGuard } from './shared/guards/throttler-behind-proxy.guard';
-import { RedisModule } from './shared/modules/redis/redis.module';
-import throttlerConfig from './config/throttler.config';
-import redisConfig from './config/redis.config';
-import { ThrottlerStorageRedisService } from './shared/modules/redis/throttler-storage-redis.service';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
 import { HttpExceptionFilter } from './shared/filters/http-exception-filter';
 import { customExceptionFactory } from './shared/helpers/custom-exception-factory';
+import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { AuthGuard } from './shared/guards/auth.guard';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 @Module({
   imports: [
+    PrismaModule,
+    UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,
       validate,
       cache: true,
-      load: [appConfig, loggerConfig, throttlerConfig, redisConfig],
+      load: [appConfig, loggerConfig],
+    }),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: {expiresIn: '36000s'}
     }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
@@ -44,33 +51,11 @@ import { customExceptionFactory } from './shared/helpers/custom-exception-factor
               'pino.transport.targets',
             ),
           },
-        },
-        exclude: [{ method: RequestMethod.GET, path: 'health' }],
+        }
       }),
-    }),
-    ThrottlerModule.forRootAsync({
-      imports: [
-        RedisModule.registerAsync({
-          inject: [ConfigService],
-          useFactory: (configService: ConfigService) =>
-            configService.get('redis'),
-        }),
-      ],
-      useFactory: (
-        configService: ConfigService,
-        throttlerStorageRedisService: ThrottlerStorageRedisService,
-      ) => ({
-        throttlers: configService.get('throttlers'),
-        storage: throttlerStorageRedisService,
-      }),
-      inject: [ConfigService, ThrottlerStorageRedisService],
-    }),
+    })
   ],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerBehindProxyGuard,
-    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -79,6 +64,10 @@ import { customExceptionFactory } from './shared/helpers/custom-exception-factor
         forbidNonWhitelisted: true,
         exceptionFactory: customExceptionFactory,
       }),
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
     },
     {
       provide: APP_INTERCEPTOR,
@@ -91,7 +80,7 @@ import { customExceptionFactory } from './shared/helpers/custom-exception-factor
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
-    },
-  ],
+    }
+  ]
 })
 export class AppModule {}

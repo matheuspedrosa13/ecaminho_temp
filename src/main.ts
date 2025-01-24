@@ -7,10 +7,21 @@ import { useContainer } from 'class-validator';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import { randomUUID } from 'crypto';
 import { REQUEST_ID_HEADER } from './constants';
+import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+
+async function getSwaggerDocumentBuilder(){
+  const config = new DocumentBuilder()
+    .setTitle('API - É Caminho ')
+    .setDescription('"É Caminho" is an app that enables employees to get rides to their destinations! In this api, you can register')
+    .setVersion('1.0')
+    .addTag('ecaminho')
+    .build();
+  return config
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(
-    AppModule,
+    AppModule, 
     new FastifyAdapter({
       trustProxy: true,
       logger: false,
@@ -31,9 +42,21 @@ async function bootstrap() {
   app.enableShutdownHooks();
   app.enableVersioning({ defaultVersion: '1', type: VersioningType.URI });
   app.enableCors(configService.get('app.cors'));
-  app.setGlobalPrefix('/api', {
+  app.setGlobalPrefix('api', {
     exclude: [{ path: 'health', method: RequestMethod.GET }],
   });
+
+  const options: SwaggerDocumentOptions =  {
+    operationIdFactory: (
+      controllerKey: string,
+      methodKey: string,
+      
+    ) => methodKey
+  };
+
+  const config = await getSwaggerDocumentBuilder(); 
+  const documentFactory = () => SwaggerModule.createDocument(app, config, options);
+  SwaggerModule.setup('api/v1/swagger', app, documentFactory);
 
   await app.listen(
     configService.get<number>('app.port'),
