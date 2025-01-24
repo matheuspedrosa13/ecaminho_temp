@@ -1,4 +1,4 @@
-import { Module, RequestMethod, ValidationPipe } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './config/app.config';
 import { validate } from './env.validation';
@@ -14,6 +14,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthGuard } from './shared/guards/auth.guard';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 @Module({
   imports: [
@@ -26,6 +28,11 @@ import { AuthGuard } from './shared/guards/auth.guard';
       validate,
       cache: true,
       load: [appConfig, loggerConfig],
+    }),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: {expiresIn: '36000s'}
     }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
