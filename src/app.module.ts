@@ -21,7 +21,6 @@ import { jwtConstants } from './constants';
   imports: [
     PrismaModule,
     UserModule,
-    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,
