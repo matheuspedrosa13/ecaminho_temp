@@ -11,7 +11,7 @@ export class VehiclesService {
     const result = await this.prisma.eca_vehicles.create({
       data: createVehicleDto,
     });
-    this.prisma.eca_users.update({where: {pk_id : userId}, data: {pfk_eca_vehicles_id : result.pk_id}} )
+    await this.prisma.eca_users.update({where: {pk_id : userId}, data: {pfk_eca_vehicles_id : result.pk_id}} )
   }
 
   async findAll() {

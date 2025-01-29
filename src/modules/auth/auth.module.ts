@@ -5,7 +5,7 @@ import { UserModule } from 'src/modules/user/user.module';
 import { AuthGuard } from '../../shared/guards/auth.guard';
 
 @Module({
-  imports: [AuthGuard, UserModule],
+  imports: [UserModule],
   controllers: [AuthController],
   providers: [AuthService]
 })

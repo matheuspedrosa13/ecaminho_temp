@@ -24,8 +24,4 @@ export class CreateVehicleDto {
   @IsNotEmpty()
   @IsInt()
   passengers: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  token: string;
 }

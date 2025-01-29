@@ -46,12 +46,13 @@ async function bootstrap() {
     exclude: [{ path: 'health', method: RequestMethod.GET }],
   });
 
-  const port = configService.get<number>('app.port') || 6767;
-  const host = configService.get<string>('app.host') || '0.0.0.0';
-  await app.listen(port, host);
+  await app.listen(
+    configService.get<number>('app.port'),
+    configService.get<string>('app.host'),
+  );
 
-  console.log(`Application is running on: http://${host}:${port}`);
 }
+
 
 bootstrap();
 
@@ -67,9 +68,4 @@ bootstrap();
 //   const config = await getSwaggerDocumentBuilder(); 
 //   const documentFactory = () => SwaggerModule.createDocument(app, config, options);
 //   SwaggerModule.setup('api/v1/swagger', app, documentFactory);
-
-//   await app.listen(
-//     configService.get<number>('app.port'),
-//     configService.get<string>('app.host'),
-//   );
 

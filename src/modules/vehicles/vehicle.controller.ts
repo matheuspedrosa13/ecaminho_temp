@@ -1,25 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { VehiclesService } from './vehicle.service';
 import { CreateVehicleDto } from './dto/createvehicle.dto';
 import { UpdateVehicleDto } from './dto/updatevehicle.dto';
 import { SkipAuth } from 'src/constants';
-import { JwtService } from '@nestjs/jwt';
-import { HttpResponse } from '../../shared/interfaces/http-response.interface';
+import { HttpResponse } from 'src/shared/interfaces/http-response.interface';
 
 
 @Controller('vehicles')
 export class VehiclesController {
-  constructor(private readonly vehiclesService: VehiclesService, private jwtService: JwtService) {}
+  constructor(private readonly vehiclesService: VehiclesService) {}
 
   @Post()
-  @SkipAuth()
-  async create(@Body() createVehicleDto: CreateVehicleDto) {
-
-    const token = createVehicleDto.token;
-    const decodedToken = this.jwtService.verify(token);
-    let userId: number;
-    userId = decodedToken.sub;
-    return await this.vehiclesService.create(createVehicleDto, userId);
+  async create(@Body() createVehicleDto: CreateVehicleDto, @Request() req) : Promise<HttpResponse<boolean>>{
+    const userReq = req.user;
+    await this.vehiclesService.create(createVehicleDto, userReq.id);
+    const response: HttpResponse<boolean> = {
+      data: true,
+      message: "Vehicle created successfully"
+    }
+    return response
   }
 
   @Get()

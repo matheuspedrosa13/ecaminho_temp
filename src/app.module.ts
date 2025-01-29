@@ -21,6 +21,7 @@ import { VehiclesModule } from './modules/vehicles/vehicle.module';
 @Module({
   imports: [
     PrismaModule,
+    AuthModule,
     UserModule,
     VehiclesModule,
     ConfigModule.forRoot({
