@@ -7,10 +7,11 @@ import { UpdateVehicleDto } from './dto/updatevehicle.dto';
 export class VehiclesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createVehicleDto: CreateVehicleDto) {
-    return await this.prisma.eca_vehicles.create({
+  async create(createVehicleDto: CreateVehicleDto, userId: number) {
+    const result = await this.prisma.eca_vehicles.create({
       data: createVehicleDto,
     });
+    this.prisma.eca_users.update({where: {pk_id : userId}, data: {pfk_eca_vehicles_id : result.pk_id}} )
   }
 
   async findAll() {
@@ -25,7 +26,7 @@ export class VehiclesService {
       include: { eca_users: true }, 
     });
     if (!vehicle) {
-      throw new NotFoundException(`Vehicle with ID ${id} not found`);
+      throw new NotFoundException(`${id} not found`);
     }
     return vehicle;
   }

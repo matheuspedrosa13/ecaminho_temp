@@ -3,15 +3,23 @@ import { VehiclesService } from './vehicle.service';
 import { CreateVehicleDto } from './dto/createvehicle.dto';
 import { UpdateVehicleDto } from './dto/updatevehicle.dto';
 import { SkipAuth } from 'src/constants';
+import { JwtService } from '@nestjs/jwt';
+import { HttpResponse } from '../../shared/interfaces/http-response.interface';
+
 
 @Controller('vehicles')
 export class VehiclesController {
-  constructor(private readonly vehiclesService: VehiclesService) {}
+  constructor(private readonly vehiclesService: VehiclesService, private jwtService: JwtService) {}
 
   @Post()
   @SkipAuth()
   async create(@Body() createVehicleDto: CreateVehicleDto) {
-    return await this.vehiclesService.create(createVehicleDto);
+
+    const token = createVehicleDto.token;
+    const decodedToken = this.jwtService.verify(token);
+    let userId: number;
+    userId = decodedToken.sub;
+    return await this.vehiclesService.create(createVehicleDto, userId);
   }
 
   @Get()
