@@ -4,6 +4,7 @@ import { HttpResponse } from 'src/shared/interfaces/http-response.interface';
 import { SkipAuth } from '../../constants';
 import { eca_users } from '@prisma/client';
 import { UserCreateDto } from './model/user.create.dto';
+import BCryptHelper from 'src/shared/helpers/crypt-password';
 
 @Controller('user')
 export class UserController {
@@ -21,12 +22,17 @@ export class UserController {
 
     @SkipAuth()
     @Post()
-    async createUser(@Body() createUserDto: UserCreateDto) : Promise<HttpResponse<eca_users>> {
+    async createUser(@Body() createUserDto: UserCreateDto): Promise<HttpResponse<eca_users>> {
+        const userPassword = createUserDto.user_password;
+    
+        const bCrypt = new BCryptHelper();
+        createUserDto.user_password = await bCrypt.hash(userPassword); // Corrigido
+    
         const user = await this.userService.createUser(createUserDto);
-        const response : HttpResponse<eca_users> = {
-            data: user,
-            message: "Success"
-        }
-        return { message: 'User created successfully!', data: user };
-    }
+    
+        return { 
+            message: "User created successfully!", 
+            data: user 
+        };
+    }    
 }
