@@ -3,9 +3,7 @@ import { VehiclesService } from './vehicle.service';
 import { CreateVehicleDto } from './dto/createvehicle.dto';
 import { UpdateVehicleDto } from './dto/updatevehicle.dto';
 import { HttpResponse } from 'src/shared/interfaces/http-response.interface';
-import { eca_vehicles as Vehicle } from '@prisma/client'; 
-
-
+import { VehicleResponseDto } from './dto/vehicleresponse.dto';
 
 @Controller('vehicles')
 export class VehiclesController {
@@ -27,40 +25,62 @@ async create(@Body() createVehicleDto: CreateVehicleDto, @Request() req): Promis
     }
     throw new HttpException({
       status: HttpStatus.INTERNAL_SERVER_ERROR,
-      error: 'Error creating vehicle',
+      error: 'error creating vehicle',
     }, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
 
  @Get()
-async findAll(): Promise<HttpResponse<Vehicle[]>> {
-  const result = await this.vehiclesService.findAll();
-  const response: HttpResponse<Vehicle[]> = { 
-    data: result,
-    message: "success"
-  };
-  return response;
+ async findAll(): Promise<HttpResponse<VehicleResponseDto[]>> {
+  const vehicles = await this.vehiclesService.findAll();
+    
+    const response = vehicles.map(vehicle => ({
+      plate: vehicle.plate,
+      model: vehicle.model,
+      brand: vehicle.brand,
+      color: vehicle.color,
+      passenger: vehicle.passenger
+    }));
+
+    return {
+      data: response,
+      message: "success"
+    };
 }
 
-  @Get(':id')
-  async findOne(@Param('id') id: number) : Promise<HttpResponse<Vehicle>>{
-    const result = await this.vehiclesService.findOne(id);
-    const response: HttpResponse<Vehicle> = {
-      data: result,
-      message: "success"
-    }
-    return response
-  }
+@Get(':id')
+async findOne(@Param('id') id: number): Promise<HttpResponse<VehicleResponseDto>> {
+  const vehicle = await this.vehiclesService.findOne(id);
+  const response: VehicleResponseDto = {
+    plate: vehicle.plate,
+    model: vehicle.model,
+    brand: vehicle.brand,
+    color: vehicle.color,
+    passenger: vehicle.passenger,
+  };
+  return {
+    data: response,
+    message: "success"
+  };
+}
 
-  @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateVehicleDto: UpdateVehicleDto) : Promise<HttpResponse<Vehicle>>{
-    const result = await this.vehiclesService.update(id, updateVehicleDto);
-    const response: HttpResponse<Vehicle> = {
-      data: result,
-      message: "success"
-    }
-    return response
-  }
+
+@Patch(':id')
+async update(@Param('id') id: number, @Body() updateVehicleDto: UpdateVehicleDto): Promise<HttpResponse<VehicleResponseDto>> {
+  const updatedVehicle = await this.vehiclesService.update(id, updateVehicleDto);
+  const response: VehicleResponseDto = {
+    plate: updatedVehicle.plate,
+    model: updatedVehicle.model,
+    brand: updatedVehicle.brand,
+    color: updatedVehicle.color,
+    passenger: updatedVehicle.passenger,
+  };
+  return {
+    data: response,
+    message: "success"
+  };
+}
+
 
   @Delete(':id')
   async remove(@Param('id') id: number) : Promise<HttpResponse<boolean>>{
