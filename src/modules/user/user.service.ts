@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { eca_users } from '@prisma/client';
 import { UserCreateDto } from './model/user.create.dto';
+import { GenderOutput } from './model/gender.output.model';
+import { create } from 'domain';
 
 @Injectable()
 export class UserService {
@@ -16,6 +18,20 @@ export class UserService {
     }
 
     async createUser(createUserDto: UserCreateDto) : Promise<eca_users> {
+        const userCpf = await this.prismaService.eca_users.findUnique({
+            where: { cpf: createUserDto.cpf }
+        });
+
+        const userEmail = await this.prismaService.eca_users.findUnique({
+            where: {email: createUserDto.email}
+        })
+
+        if (userCpf) 
+            throw new HttpException("cpf already exists", HttpStatus.CONFLICT);
+        
+        if (userEmail) 
+            throw new HttpException("email already exists", HttpStatus.CONFLICT);
+    
         return await this.prismaService.eca_users.create({data: createUserDto});
     }
 }
