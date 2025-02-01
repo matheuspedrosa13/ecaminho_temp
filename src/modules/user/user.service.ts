@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { eca_genders, eca_users, Prisma, PrismaClient } from '@prisma/client';
+import { eca_users } from '@prisma/client';
 import { UserCreateDto } from './model/user.create.dto';
-import { create } from 'domain';
-import BCryptHelper from 'src/shared/helpers/crypt-password';
 
 @Injectable()
 export class UserService {
