@@ -7,7 +7,7 @@ import { UserCreateDto } from './model/user.create.dto';
 export class UserService {
     constructor(private readonly prismaService: PrismaService) {}
 
-    async getGenders(){
+    async getGenders() : Promise<GenderOutput[]>{
         return this.prismaService.eca_genders.findMany({select: {gender_name: true}})
     }
 
