@@ -6,6 +6,7 @@ import { eca_users } from '@prisma/client';
 import { UserCreateDto } from './model/user.create.dto';
 import BCryptHelper from 'src/shared/helpers/crypt-password';
 import { JwtService } from '@nestjs/jwt';
+import { GenderOutput } from './model/gender.output.model';
 
 @Controller('user')
 export class UserController {
@@ -15,13 +16,13 @@ export class UserController {
     ) {}
 
     @Get('genders')
-    async getGenders() {
-        const genders = await this.userService.getGenders();
-        const response: HttpResponse<any> = {
-            data: genders,
-            message: "Success"
-        };
-        return response;
+    async getGenders() : Promise<HttpResponse<GenderOutput[]>>{
+        const genders = await this.userService.getGenders()
+        const response : HttpResponse<GenderOutput[]> = {
+              data: genders,
+              message: "Success"
+        }
+        return response
     }
 
     @SkipAuth()
