@@ -1,0 +1,23 @@
+services:
+  - name: e-carona-api
+    type: web
+    env: docker
+    repo: https://github.com/seu-repo.git
+    branch: main
+    plan: free
+    region: oregon
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_PORT
+        value: 6767
+      - key: DB_HOST
+        value: dpg-cqodcobv2p9s73ao4800-a.oregon-postgres.render.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_USER
+        value: dbecaminho_user
+      - key: DB_PASSWORD
+        value: cDlg89OD1r4yUb6j0NyKltdl9PyolNp7
+      - key: DB_NAME
+        value: db_ecaminho
