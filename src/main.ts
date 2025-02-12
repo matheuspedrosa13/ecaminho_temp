@@ -7,6 +7,7 @@ import { useContainer } from 'class-validator';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import { randomUUID } from 'crypto';
 import { REQUEST_ID_HEADER } from './constants';
+
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
 
 async function getSwaggerDocumentBuilder(){
@@ -62,6 +63,23 @@ async function bootstrap() {
     configService.get<number>('app.port'),
     configService.get<string>('app.host'),
   );
+
+
 }
 
+
 bootstrap();
+
+
+//   const options: SwaggerDocumentOptions =  {
+//     operationIdFactory: (
+//       controllerKey: string,
+//       methodKey: string,
+      
+//     ) => methodKey
+//   };
+
+//   const config = await getSwaggerDocumentBuilder(); 
+//   const documentFactory = () => SwaggerModule.createDocument(app, config, options);
+//   SwaggerModule.setup('api/v1/swagger', app, documentFactory);
+

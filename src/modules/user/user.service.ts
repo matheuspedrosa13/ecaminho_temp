@@ -9,15 +9,18 @@ import { GenderOutput } from './model/gender.output.model';
 export class UserService {
     constructor(private readonly prismaService: PrismaService) {}
 
-    async getGenders() : Promise<GenderOutput[]>{
-        return this.prismaService.eca_genders.findMany({select: {gender_name: true}})
+    async getGenders(): Promise<GenderOutput[]> {
+        return this.prismaService.eca_genders.findMany({ select: { gender_name: true } });
     }
 
-    async getUserByEmail(userEmail: string) : Promise<ValidateToken | undefined>{
-        return await this.prismaService.eca_users.findFirst({where: {email: userEmail}, select: {pk_id: true, email: true, user_password: true}})
+    async getUserByEmail(userEmail: string): Promise<ValidateToken | undefined> {
+        return await this.prismaService.eca_users.findFirst({
+            where: { email: userEmail },
+            select: { pk_id: true, email: true, user_password: true }
+        });
     }
 
-    async createUser(createUserDto: UserCreateDto) : Promise<eca_users> {
-        return await this.prismaService.eca_users.create({data: createUserDto});
+    async createUser(createUserDto: UserCreateDto): Promise<eca_users> {
+        return await this.prismaService.eca_users.create({ data: createUserDto });
     }
 }

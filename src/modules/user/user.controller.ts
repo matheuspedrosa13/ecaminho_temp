@@ -7,7 +7,7 @@ import { UserCreateDto } from './model/user.create.dto';
 import BCryptHelper from 'src/shared/helpers/crypt-password';
 import { JwtService } from '@nestjs/jwt';
 import { GenderOutput } from './model/gender.output.model';
-import {ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -17,13 +17,13 @@ export class UserController {
     ) {}
 
     @Get('genders')
-    async getGenders() : Promise<HttpResponse<GenderOutput[]>>{
-        const genders = await this.userService.getGenders()
-        const response : HttpResponse<GenderOutput[]> = {
-              data: genders,
-              message: "Success"
-        }
-        return response
+    async getGenders(): Promise<HttpResponse<GenderOutput[]>> {
+        const genders = await this.userService.getGenders();
+        const response: HttpResponse<GenderOutput[]> = {
+            data: genders,
+            message: "Success"
+        };
+        return response;
     }
 
     @SkipAuth()
@@ -32,18 +32,18 @@ export class UserController {
     @ApiResponse({ status: 200 })
     async createUser(@Body() createUserDto: UserCreateDto): Promise<HttpResponse<{ user: eca_users, token: string }>> {
         const userPassword = createUserDto.user_password;
-    
+
         const bCrypt = new BCryptHelper();
         createUserDto.user_password = await bCrypt.hash(userPassword);
-    
+
         const user = await this.userService.createUser(createUserDto);
 
         const payload = { username: user.email, password: user.user_password };
         const token = await this.jwtService.signAsync(payload);
-    
+
         return { 
             message: "User created successfully!", 
             data: { user, token } 
         };
-    }    
+    }
 }

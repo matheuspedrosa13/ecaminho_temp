@@ -16,11 +16,14 @@ import { UserModule } from './modules/user/user.module';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { VehiclesModule } from './modules/vehicles/vehicle.module';
 
 @Module({
   imports: [
     PrismaModule,
+    AuthModule,
     UserModule,
+    VehiclesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,
