@@ -46,22 +46,23 @@ class EnvironmentVariables {
   @IsIn(['0', '1'])
   PINO_PRETTY_MODE: string;
 
-  @IsNumber()
-  THROTTLER_TTL: number;
 
-  @IsNumber()
-  THROTTLER_LIMIT: number;
+  // @IsNumber()
+  // THROTTLER_TTL: number;
 
-  @IsIP()
-  REDIS_HOST: string;
+  // @IsNumber()
+  // THROTTLER_LIMIT: number;
 
-  @IsNumber()
-  @Min(1)
-  @Max(65535)
-  REDIS_PORT: number;
+  // @IsIP()
+  // REDIS_HOST: string;
 
-  @IsNumber()
-  REDIS_DB: number;
+  // @IsNumber()
+  // @Min(1)
+  // @Max(65535)
+  // REDIS_PORT: number;
+
+  // @IsNumber()
+  // REDIS_DB: number;
 
   @IsString()
   PRISMA_DB_URL: string;

@@ -9,26 +9,42 @@ export class VehiclesService {
   constructor(private prisma: PrismaService) {}
 
   async create(createVehicleDto: CreateVehicleDto, userId: number): Promise<VehicleResponseDto> {
+    const { stops, ...vehicleData } = createVehicleDto;
+    
     const plate = await this.prisma.eca_vehicles.findUnique({
-      where: { plate: createVehicleDto.plate },
+      where: { plate: vehicleData.plate },
     });
+
     if (plate) 
       throw new HttpException("plate already exists", HttpStatus.CONFLICT);
+
     const result = await this.prisma.eca_vehicles.create({
-      data: createVehicleDto,
+      data: vehicleData, 
     });
+
     await this.prisma.eca_users.update({
       where: { pk_id: userId },
       data: { pfk_eca_vehicles_id: result.pk_id }
     });
+
+    if (stops && stops.length > 0) {
+      await this.prisma.eca_stops.createMany({
+        data: stops.map((address) => ({
+          address,
+          pfk_eca_users_id: userId,
+        })),
+      });
+    }
+
     return {
-      plate: createVehicleDto.plate,
-      model: createVehicleDto.model,
-      brand: createVehicleDto.brand,
-      color: createVehicleDto.color,
-      passenger: createVehicleDto.passengers
+      plate: result.plate,
+      model: result.model,
+      brand: result.brand,
+      color: result.color,
+      passengers: result.passengers
     };
-  }
+}
+
 
   async findAll(): Promise<VehicleResponseDto[]> {
     const vehicles = await this.prisma.eca_vehicles.findMany({
@@ -39,7 +55,7 @@ export class VehiclesService {
       model: vehicle.model,
       brand: vehicle.brand,
       color: vehicle.color,
-      passenger: vehicle.passengers
+      passengers: vehicle.passengers
     }));
   }
 
@@ -55,7 +71,7 @@ export class VehiclesService {
       model: vehicle.model,
       brand: vehicle.brand,
       color: vehicle.color,
-      passenger: vehicle.passengers
+      passengers: vehicle.passengers
     };
   }
 
@@ -70,7 +86,7 @@ export class VehiclesService {
       model: updatedVehicle.model,
       brand: updatedVehicle.brand,
       color: updatedVehicle.color,
-      passenger: updatedVehicle.passengers
+      passengers: updatedVehicle.passengers
     };
   }
 
@@ -85,5 +101,4 @@ export class VehiclesService {
       throw new HttpException('error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  
 }

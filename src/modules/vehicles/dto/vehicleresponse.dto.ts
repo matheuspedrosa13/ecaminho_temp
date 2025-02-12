@@ -14,5 +14,6 @@ export class VehicleResponseDto {
   color: string;
 
   @IsNumber()
-  passenger: number;
+  passengers: number;
+
 }
