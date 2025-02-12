@@ -7,7 +7,7 @@ import { UserCreateDto } from './model/user.create.dto';
 import BCryptHelper from 'src/shared/helpers/crypt-password';
 import { JwtService } from '@nestjs/jwt';
 import { GenderOutput } from './model/gender.output.model';
-import { ApiRequestedRangeNotSatisfiableResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
