@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { SigninDto } from './dto/signin.dto';
 import { HttpResponse } from '../../shared/interfaces/http-response.interface';
 import { SkipAuth } from 'src/constants';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -10,13 +11,18 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('signin')
+  @ApiTags('auth')
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 404, description: 'User not found in database.' })
+  @ApiResponse({ status: 401, description: 'Unmatched passwords.' })
   @SkipAuth()
-  async signIn(@Body() signInDto: SigninDto) : Promise<HttpResponse<string>>{
-    let token = await this.authService.signIn(signInDto)
-    const response : HttpResponse<string> = {
+  async signIn(@Body() signInDto: SigninDto): Promise<HttpResponse<string>> {
+    const token = await this.authService.signIn(signInDto);
+    const response: HttpResponse<string> = {
       data: token,
-      message: "Success"
-    }
-    return response
+      message: 'Success',
+    };
+
+    return response;
   }
 }
