@@ -3,6 +3,7 @@ import { UserService } from 'src/modules/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { SigninDto } from './dto/signin.dto';
 import BCryptHelper from 'src/shared/helpers/crypt-password';
+import { SempreTokenDto } from './dto/sempre-token.dto';
 
 @Injectable()
 export class AuthService {
