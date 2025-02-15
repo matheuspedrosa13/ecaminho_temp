@@ -37,7 +37,7 @@ export class AuthService {
         headers: { "Content-Type": "application/json" }
     }).then(response => {
         if(response.ok)
-            isUserValid = true;''
+            isUserValid = true;
     })
 
     return isUserValid;
