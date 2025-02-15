@@ -3,6 +3,7 @@ import { UserService } from 'src/modules/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { SigninDto } from './dto/signin.dto';
 import BCryptHelper from 'src/shared/helpers/crypt-password';
+import { SempreTokenDto } from './dto/sempre-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,5 +26,20 @@ export class AuthService {
 
     const payload = { id: user.pk_id, email: user.email };
     return await this.jwtService.signAsync(payload);
+  }
+  
+  async signUpSempre(sempreTokenDto: SempreTokenDto) : Promise<boolean>{
+    const urlSempre = "https://educa.semprejbs.com.br/api/auth/v1/auth/sign-in";
+    let isUserValid = false;
+    await fetch(urlSempre, {
+        method: 'POST',
+        body: JSON.stringify(sempreTokenDto),
+        headers: { "Content-Type": "application/json" }
+    }).then(response => {
+        if(response.ok)
+            isUserValid = true;
+    })
+
+    return isUserValid;
   }
 }

@@ -4,6 +4,7 @@ import { SigninDto } from './dto/signin.dto';
 import { HttpResponse } from '../../shared/interfaces/http-response.interface';
 import { SkipAuth } from 'src/constants';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SempreTokenDto } from './dto/sempre-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,5 +25,20 @@ export class AuthController {
     };
 
     return response;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('signup/sempre')
+  @ApiTags('auth')
+  @ApiResponse({ status: 200, type: Boolean })
+  @SkipAuth()
+  async signupSempre(@Body() sempreTokenDto: SempreTokenDto) : Promise<HttpResponse<boolean>> {
+      const isUserValid = await this.authService.signUpSempre(sempreTokenDto)
+      const response: HttpResponse<boolean> = {
+          data: isUserValid,
+          message: isUserValid ? "" : "Token inválido para CPF informado!"
+      }
+
+      return response
   }
 }
