@@ -26,4 +26,19 @@ export class AuthService {
     const payload = { id: user.pk_id, email: user.email };
     return await this.jwtService.signAsync(payload);
   }
+  
+  async signUpSempre(sempreTokenDto: SempreTokenDto) : Promise<boolean>{
+    const urlSempre = "https://educa.semprejbs.com.br/api/auth/v1/auth/sign-in";
+    let isUserValid = false;
+    await fetch(urlSempre, {
+        method: 'POST',
+        body: JSON.stringify(sempreTokenDto),
+        headers: { "Content-Type": "application/json" }
+    }).then(response => {
+        if(response.ok)
+            isUserValid = true;''
+    })
+
+    return isUserValid;
+  }
 }
