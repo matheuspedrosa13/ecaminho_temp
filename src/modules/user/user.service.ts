@@ -20,6 +20,16 @@ export class UserService {
         });
     }
 
+    async verifyCpf(userCpf: string): Promise<boolean> {
+        const user = await this.prismaService.eca_users.findFirst({
+            where: { cpf: userCpf },
+            select: { pk_id: true }
+        });
+
+        const userExists = user !== null;
+        return userExists;
+    }
+
     async createUser(createUserDto: UserCreateDto): Promise<eca_users> {
         return await this.prismaService.eca_users.create({ data: createUserDto });
     }

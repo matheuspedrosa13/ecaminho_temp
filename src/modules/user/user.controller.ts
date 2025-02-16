@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { HttpResponse } from 'src/shared/interfaces/http-response.interface';
 import { SkipAuth } from '../../constants';
@@ -23,6 +23,17 @@ export class UserController {
             data: genders,
             message: "Success"
         };
+        return response;
+    }
+
+    @SkipAuth()
+    @Get('verifyCpf')
+    async verifyCpf(@Query('cpf') cpf: string): Promise<HttpResponse<boolean>> {
+        const userExists = await this.userService.verifyCpf(cpf);
+
+        const response: HttpResponse<boolean> = {
+            data: userExists
+        }
         return response;
     }
 
