@@ -16,7 +16,7 @@ export class UserService {
     async getUserByCpf(userCpf: string): Promise<ValidateToken | undefined> {
         return await this.prismaService.eca_users.findFirst({
             where: { cpf: userCpf },
-            select: { pk_id: true, cpf: true, user_password: true }
+            select: { pk_id: true, cpf: true, email: true, user_password: true }
         });
     }
 
