@@ -12,7 +12,7 @@ export class AuthService {
   ) {}
 
   async signIn(signInDto: SigninDto): Promise<string> {
-    const user = await this.userService.getUserByEmail(signInDto.email);
+    const user = await this.userService.getUserByCpf(signInDto.cpf);
 
     if(!user)
       throw new NotFoundException("User doesn't exist in database.");
