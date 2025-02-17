@@ -13,10 +13,10 @@ export class UserService {
         return this.prismaService.eca_genders.findMany({ select: { gender_name: true } });
     }
 
-    async getUserByEmail(userEmail: string): Promise<ValidateToken | undefined> {
+    async getUserByCpf(userCpf: string): Promise<ValidateToken | undefined> {
         return await this.prismaService.eca_users.findFirst({
-            where: { email: userEmail },
-            select: { pk_id: true, email: true, user_password: true }
+            where: { cpf: userCpf },
+            select: { pk_id: true, cpf: true, user_password: true }
         });
     }
 
